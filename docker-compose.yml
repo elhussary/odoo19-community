@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+    volumes:
+      - odoo19-community-pg-data:/var/lib/postgresql/data
+
+  odoo19:
+    image: odoo:19.0
+    depends_on:
+      - db
+    ports:
+      - "8090:8069"
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      - odoo19-community-web-data:/var/lib/odoo
+      - /home/elhussary/odoo19-community/config/odoo.conf:/etc/odoo/odoo.conf:ro
+      - /home/elhussary/odoo19-community/addons:/mnt/extra-addons
+
+volumes:
+  odoo19-community-web-data:
+  odoo19-community-pg-data:
