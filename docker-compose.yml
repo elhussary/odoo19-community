@@ -17,6 +17,11 @@ services:
   # Database
   odoo19-community-db:
     image: postgres:16
+    command: >
+      postgres
+      -c shared_buffers=2GB
+      -c effective_cache_size=6GB
+      -c work_mem=32MB
     container_name: odoo19-db
     restart: always
     environment:
