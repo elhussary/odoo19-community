@@ -1,15 +1,38 @@
 services:
+  # Nginx Proxy Manager
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: npm
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+    networks:
+      - odoo-network
+
+  # Database
   odoo19-community-db:
     image: postgres:16
+    container_name: odoo19-db
+    restart: always
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: odoo
       POSTGRES_PASSWORD: odoo
     volumes:
       - odoo19-community-pg-data:/var/lib/postgresql/data
+    networks:
+      - odoo-network
 
+  # Odoo
   odoo19-community:
     image: odoo:19.0
+    container_name: odoo19-app
+    restart: unless-stopped
     depends_on:
       - odoo19-community-db
     ports:
@@ -22,6 +45,13 @@ services:
       - odoo19-community-web-data:/var/lib/odoo
       - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
       - ./addons:/mnt/extra-addons
+    networks:
+      - odoo-network
+
+networks:
+  odoo-network:
+    driver: bridge
+
 volumes:
   odoo19-community-web-data:
   odoo19-community-pg-data:
